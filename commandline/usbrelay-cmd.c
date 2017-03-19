@@ -1,4 +1,4 @@
-// Command line tool for Chinese USB/HID relays
+// Command line tool for low-cost USB/HID relays
 //
 // pa02 20-Nov-2014 supports 1,2,4,8 - relay devices
 //
@@ -169,7 +169,6 @@ static int enumFunc(USBDEVHANDLE dev, void *context)
 static USBDEVHANDLE openDevice(void)
 {
     int err;
-
     err = usbhidEnumDevices(USB_CFG_VENDOR_ID, USB_CFG_DEVICE_ID, &g_enumCtx, enumFunc);
 
     if ( err || !g_enumCtx.mydev )
@@ -344,12 +343,13 @@ int main(int argc, char **argv)
     }
 
     if ( strncasecmp(arg1, "id=", 3) == 0 ) {
+        /* Set the ID for following commands. else use 1st found device.*/
         if (strlen(&arg1[3]) != USB_RELAY_ID_STR_LEN) {
             printerr("ERROR: ID must be %d characters (%s)\n", USB_RELAY_ID_STR_LEN, arg1);
             return 1;
         }
         
-        strcpy( g_enumCtx.id, &arg1[3]);
+        strcpy(g_enumCtx.id, &arg1[3]);
 
         // shift following params
         arg1 = arg2;
@@ -362,7 +362,6 @@ int main(int argc, char **argv)
 
     if ( strncasecmp(arg1, "stat", 4) == 0 ) { // stat|state|status
         err = show_status(dev);
-        // TODO enumerate all devices
     }else if( strcasecmp(arg1, "on" ) == 0) {
         err = rel_onoff(dev, 1, arg2);
     }else if( strcasecmp(arg1, "off" ) == 0) {
@@ -379,4 +378,3 @@ int main(int argc, char **argv)
     return err;
 }
 
-/* ------------------------------------------------------------------------- */
